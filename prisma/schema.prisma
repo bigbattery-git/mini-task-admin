@@ -17,8 +17,8 @@ model User{
   name      String
   role      Role      @default(USER) 
   
-  task      Task[]
-  comment   Comment[]
+  tasks      Task[]
+  comments   Comment[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -32,7 +32,7 @@ model Task{
   content   String
   status    TaskStatus  @default(TODO)
 
-  comment   Comment[]
+  comments   Comment[]
 
   authorId  Int         @map("author_id")
   author    User        @relation(fields: [authorId], references: [id], onDelete: Restrict)
