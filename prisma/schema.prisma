@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      Role      @default(USER) 
+  
+  task      Task[]
+  comment   Comment[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Task{
+  id        Int         @id @default(autoincrement())
+  title     String
+  content   String
+  status    TaskStatus  @default(TODO)
+
+  comment   Comment[]
+
+  authorId  Int         @map("author_id")
+  author    User        @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  deletedAt DateTime?   @map("deleted_at")
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  content String
+
+  taskId Int @map("task_id")
+  task Task @relation(fields: [taskId], references: [id], onDelete: Restrict)
+
+  authorId Int @map("author_id")
+  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+}
+
+enum Role{
+  USER
+  ADMIN
+}
+
+enum TaskStatus{
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+// npx prisma migrate dev --name init init이란 이름으로 마이그레이션 하기
+// npx prisma studio : 브라우저로 prisma 테이블 확인하기
